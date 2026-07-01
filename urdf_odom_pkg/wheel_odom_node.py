@@ -28,11 +28,19 @@ class WheelOdomNode(Node):
 
         self.left_joints = [
             "Revolute_35",
-            "Revolute_38",
         ]
 
         self.right_joints = [
+            "Revolute_38",
+        ]
+
+        self.debug_left_joints = [
+            "Revolute_35",
             "Revolute_29",
+        ]
+
+        self.debug_right_joints = [
+            "Revolute_38",
             "Revolute_32",
         ]
 
@@ -125,19 +133,23 @@ class WheelOdomNode(Node):
         velocity_msg = Float64MultiArray()
         velocity_msg.layout.dim = [
             MultiArrayDimension(
-                label="left_0_left_1_right_0_right_1_left_avg_right_avg",
+                label="left_front_left_rear_right_front_right_rear_left_avg_right_avg",
                 size=6,
                 stride=6,
             )
         ]
 
+        for joint_name in self.debug_left_joints + self.debug_right_joints:
+            if joint_name not in msg.name:
+                return
+
         left_velocities = [
             msg.velocity[msg.name.index(joint_name)]
-            for joint_name in self.left_joints
+            for joint_name in self.debug_left_joints
         ]
         right_velocities = [
             msg.velocity[msg.name.index(joint_name)]
-            for joint_name in self.right_joints
+            for joint_name in self.debug_right_joints
         ]
 
         velocity_msg.data = [
