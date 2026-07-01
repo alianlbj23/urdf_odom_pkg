@@ -6,6 +6,7 @@ from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import TransformStamped
+from std_msgs.msg import Float64MultiArray, MultiArrayDimension
 from tf2_ros import TransformBroadcaster
 
 
@@ -44,6 +45,11 @@ class WheelOdomNode(Node):
         self.last_time = None
 
         self.odom_pub = self.create_publisher(Odometry, "/odom", 10)
+        self.wheel_velocity_pub = self.create_publisher(
+            Float64MultiArray,
+            "/wheel_joint_velocities",
+            10,
+        )
         self.tf_broadcaster = TransformBroadcaster(self)
 
         self.sub = self.create_subscription(
@@ -92,6 +98,8 @@ class WheelOdomNode(Node):
         if left_rad_s is None or right_rad_s is None:
             return
 
+        self.publish_wheel_velocities(msg, left_rad_s, right_rad_s)
+
         if self.reverse_left:
             left_rad_s *= -1.0
 
@@ -112,6 +120,35 @@ class WheelOdomNode(Node):
 
         self.publish_odom(now, linear_v, angular_w, qx, qy, qz, qw)
         self.publish_tf(now, qx, qy, qz, qw)
+
+    def publish_wheel_velocities(self, msg, left_average, right_average):
+        velocity_msg = Float64MultiArray()
+        velocity_msg.layout.dim = [
+            MultiArrayDimension(
+                label="left_0_left_1_right_0_right_1_left_avg_right_avg",
+                size=6,
+                stride=6,
+            )
+        ]
+
+        left_velocities = [
+            msg.velocity[msg.name.index(joint_name)]
+            for joint_name in self.left_joints
+        ]
+        right_velocities = [
+            msg.velocity[msg.name.index(joint_name)]
+            for joint_name in self.right_joints
+        ]
+
+        velocity_msg.data = [
+            left_velocities[0],
+            left_velocities[1],
+            right_velocities[0],
+            right_velocities[1],
+            left_average,
+            right_average,
+        ]
+        self.wheel_velocity_pub.publish(velocity_msg)
 
     def publish_odom(self, now, linear_v, angular_w, qx, qy, qz, qw):
         odom = Odometry()
