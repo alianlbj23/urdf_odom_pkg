@@ -44,8 +44,9 @@ def generate_launch_description():
         output="screen",
         parameters=[{
             "use_sim_time": ParameterValue(use_sim_time, value_type=bool),
-            "publish_odom": "/odom",
-            "publish_tf": True,
+            # EKF consumes this pose and is the sole odom -> base_link TF source.
+            "publish_odom": "/lidar_odom",
+            "publish_tf": False,
             "base_frame": base_frame,
             "odom_frame": odom_frame,
             "laser_frame": laser_frame,

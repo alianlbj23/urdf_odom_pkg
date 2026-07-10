@@ -1,0 +1,43 @@
+ekf_filter_node:
+  ros__parameters:
+    frequency: 50.0
+    sensor_timeout: 0.2
+    two_d_mode: true
+    publish_tf: true
+
+    map_frame: map
+    odom_frame: odom
+    base_link_frame: base_link
+    world_frame: odom
+
+    # 15-value order:
+    # [x, y, z, roll, pitch, yaw,
+    #  vx, vy, vz, vroll, vpitch, vyaw,
+    #  ax, ay, az]
+
+    # Actual wheel velocity: fuse forward body velocity only.
+    twist0: /wheel_twist
+    twist0_config: [false, false, false,
+                    false, false, false,
+                    true,  false, false,
+                    false, false, false,
+                    false, false, false]
+    twist0_queue_size: 10
+    twist0_nodelay: true
+
+    # First-pass IMU strategy: fuse yaw rate only. Enable yaw orientation only
+    # after validating REP-103 axes and nonzero orientation covariance.
+    imu0: /imu
+    imu0_config: [false, false, false,
+                  false, false, false,
+                  false, false, false,
+                  false, false, true,
+                  false, false, false]
+    imu0_queue_size: 20
+    imu0_nodelay: true
+    imu0_differential: false
+    imu0_relative: false
+    imu0_remove_gravitational_acceleration: false
+
+    print_diagnostics: true
+    debug: false

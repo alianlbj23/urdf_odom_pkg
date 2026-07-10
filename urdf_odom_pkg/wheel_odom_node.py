@@ -28,10 +28,12 @@ class WheelOdomNode(Node):
 
         self.left_joints = [
             "Revolute_35",
+            "Revolute_29",
         ]
 
         self.right_joints = [
             "Revolute_38",
+            "Revolute_32",
         ]
 
         self.debug_left_joints = [

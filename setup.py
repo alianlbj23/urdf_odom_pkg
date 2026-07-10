@@ -14,6 +14,11 @@ setup(
         ('share/' + package_name, ['package.xml']),
         (os.path.join("share", package_name, "launch"), glob("launch/*.launch.py")),
         (os.path.join("share", package_name, "config"), glob("config/*.yaml")),
+
+        # maps folder
+        (os.path.join("share", package_name, "maps"), ["maps/.gitkeep"]),
+        (os.path.join("share", package_name, "maps"), glob("maps/*.yaml")),
+        (os.path.join("share", package_name, "maps"), glob("maps/*.pgm")),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -29,6 +34,7 @@ setup(
     entry_points={
         'console_scripts': [
             "wheel_odom_node = urdf_odom_pkg.wheel_odom_node:main",
+            "wheel_twist_node = urdf_odom_pkg.wheel_twist_node:main",
         ],
     },
 )
